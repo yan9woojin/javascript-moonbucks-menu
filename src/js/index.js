@@ -26,19 +26,26 @@ function App() {
   });
 
   $("#espresso-menu-name").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      const $espressoMenuName = $("#espresso-menu-name").value;
-
-      $("#espresso-menu-list").insertAdjacentHTML(
-        "beforeend",
-        menuItemTemplate($espressoMenuName),
-      );
-
-      const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
-      $(".menu-count").textContent = `총 ${menuCount}개`;
-
-      $("#espresso-menu-name").value = "";
+    if (e.key !== "Enter") {
+      return;
     }
+
+    const $espressoMenuName = $("#espresso-menu-name").value;
+
+    if ($espressoMenuName === "") {
+      alert("값을 입력해주세요.");
+      return;
+    }
+
+    $("#espresso-menu-list").insertAdjacentHTML(
+      "beforeend",
+      menuItemTemplate($espressoMenuName),
+    );
+
+    const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
+    $(".menu-count").textContent = `총 ${menuCount}개`;
+
+    $("#espresso-menu-name").value = "";
   });
 }
 
