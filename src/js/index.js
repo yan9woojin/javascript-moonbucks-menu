@@ -25,11 +25,7 @@ function App() {
     e.preventDefault();
   });
 
-  $("#espresso-menu-name").addEventListener("keypress", (e) => {
-    if (e.key !== "Enter") {
-      return;
-    }
-
+  const addMenuName = () => {
     const $espressoMenuName = $("#espresso-menu-name").value;
 
     if ($espressoMenuName === "") {
@@ -46,6 +42,16 @@ function App() {
     $(".menu-count").textContent = `총 ${menuCount}개`;
 
     $("#espresso-menu-name").value = "";
+  };
+
+  $("#espresso-menu-submit-button").addEventListener("click", addMenuName);
+
+  $("#espresso-menu-name").addEventListener("keypress", (e) => {
+    if (e.key !== "Enter") {
+      return;
+    }
+
+    addMenuName();
   });
 }
 
