@@ -29,7 +29,7 @@ function App() {
 
   const render = () => {
     const template = this.menu[this.currentCategory]
-      .map((item, index) => menuItemTemplate(item.name, index))
+      .map((item, index) => menuItemTemplate(item.name, index, item.soldOut))
       .join("");
 
     $("#menu-list").innerHTML = template;
@@ -37,10 +37,18 @@ function App() {
     updateMenuCount();
   };
 
-  const menuItemTemplate = (menuName, index) => {
+  const menuItemTemplate = (menuName, index, isSoldOut) => {
     return `
     <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-      <span class="w-100 pl-2 menu-name">${menuName}</span>
+      <span class="${
+        isSoldOut ? "sold-out" : ""
+      } w-100 pl-2 menu-name">${menuName}</span>
+      <button
+        type="button"
+        class="bg-gray-50 text-gray-500 text-sm mr-1 menu-sold-out-button"
+      >
+        품절
+      </button>
       <button
         type="button"
         class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -105,6 +113,14 @@ function App() {
     }
   };
 
+  const soldOutMenu = (e) => {
+    const menuId = e.target.closest("li").dataset.menuId;
+    this.menu[this.currentCategory][menuId].soldOut =
+      !this.menu[this.currentCategory][menuId].soldOut;
+    store.setLocalStorage(this.menu);
+    render();
+  };
+
   $("nav").addEventListener("click", (e) => {
     if (e.target.classList.contains("cafe-category-name")) {
       const categoryName = e.target.dataset.categoryName;
@@ -127,6 +143,10 @@ function App() {
   });
 
   $("#menu-list").addEventListener("click", (e) => {
+    if (e.target.classList.contains("menu-sold-out-button")) {
+      soldOutMenu(e);
+    }
+
     if (e.target.classList.contains("menu-edit-button")) {
       updateMenuName(e);
     }
