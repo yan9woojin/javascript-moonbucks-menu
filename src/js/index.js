@@ -5,12 +5,29 @@ const store = {
     localStorage.setItem("menu", JSON.stringify(menu));
   },
   getLocalStorage() {
-    return localStorage.getItem("menu");
+    return JSON.parse(localStorage.getItem("menu"));
   },
 };
 
 function App() {
   this.menu = [];
+
+  this.init = () => {
+    if (store.getLocalStorage().length > 1) {
+      this.menu = store.getLocalStorage();
+      render();
+    }
+  };
+
+  const render = () => {
+    const template = this.menu
+      .map((item, index) => menuItemTemplate(item.name, index))
+      .join("");
+
+    $("#espresso-menu-list").innerHTML = template;
+
+    updateMenuCount();
+  };
 
   const menuItemTemplate = (menuName, index) => {
     return `
@@ -46,16 +63,10 @@ function App() {
     }
 
     this.menu.push({ name: menuName });
-
     store.setLocalStorage(this.menu);
 
-    const template = this.menu
-      .map((item, index) => menuItemTemplate(item.name, index))
-      .join("");
+    render();
 
-    $("#espresso-menu-list").innerHTML = template;
-
-    updateMenuCount();
     $("#espresso-menu-name").value = "";
   };
 
@@ -109,3 +120,4 @@ function App() {
 }
 
 const app = new App();
+app.init();
