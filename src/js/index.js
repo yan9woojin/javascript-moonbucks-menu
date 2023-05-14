@@ -1,6 +1,17 @@
 const $ = (selector) => document.querySelector(selector);
 
+const store = {
+  setLocalStorage(menu) {
+    localStorage.setItem("menu", JSON.stringify(menu));
+  },
+  getLocalStorage() {
+    return localStorage.getItem("menu");
+  },
+};
+
 function App() {
+  this.menu = [];
+
   const menuItemTemplate = (menuName) => {
     return `
     <li class="menu-list-item d-flex items-center py-2">
@@ -34,10 +45,15 @@ function App() {
       return;
     }
 
-    $("#espresso-menu-list").insertAdjacentHTML(
-      "beforeend",
-      menuItemTemplate(menuName),
-    );
+    this.menu.push({ name: menuName });
+
+    store.setLocalStorage(this.menu);
+
+    const template = this.menu
+      .map((item) => menuItemTemplate(item.name))
+      .join("");
+
+    $("#espresso-menu-list").innerHTML = template;
 
     updateMenuCount();
     $("#espresso-menu-name").value = "";
@@ -84,4 +100,4 @@ function App() {
   });
 }
 
-App();
+const app = new App();
