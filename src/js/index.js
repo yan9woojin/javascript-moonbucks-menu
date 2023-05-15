@@ -130,11 +130,14 @@ function App() {
   };
 
   const initEventListeners = () => {
-    $("nav").addEventListener("click", (e) => {
+    $("nav").addEventListener("click", async (e) => {
       if (e.target.classList.contains("cafe-category-name")) {
         const categoryName = e.target.dataset.categoryName;
         this.currentCategory = categoryName;
         $("#category-title").textContent = `${e.target.textContent} 메뉴 관리`;
+        this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+          this.currentCategory,
+        );
         render();
       }
     });
