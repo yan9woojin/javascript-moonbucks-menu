@@ -3,6 +3,13 @@ import { $ } from "./utils/dom.js";
 
 const BASE_URL = "http://localhost:3000/api";
 
+const MenuApi = {
+  async getAllMenuByCategory(category) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`);
+    return response.json();
+  },
+};
+
 function App() {
   this.menu = {
     espresso: [],
@@ -14,10 +21,10 @@ function App() {
 
   this.currentCategory = "espresso";
 
-  this.init = () => {
-    if (store.getLocalStorage()) {
-      this.menu = store.getLocalStorage();
-    }
+  this.init = async () => {
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory,
+    );
     render();
     initEventListeners();
   };
@@ -63,7 +70,7 @@ function App() {
     $(".menu-count").textContent = `총 ${menuCount}개`;
   };
 
-  const addMenuName = () => {
+  const addMenuName = async () => {
     const menuName = $("#menu-name").value;
 
     if (menuName === "") {
@@ -71,7 +78,7 @@ function App() {
       return;
     }
 
-    fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
+    await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: menuName }),
@@ -79,8 +86,9 @@ function App() {
       .then((response) => response.json())
       .then((data) => console.log(data));
 
-    // this.menu[this.currentCategory].push({ name: menuName });
-    store.setLocalStorage(this.menu);
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory,
+    );
     $("#menu-name").value = "";
     render();
   };
