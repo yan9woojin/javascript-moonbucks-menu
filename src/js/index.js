@@ -19,6 +19,22 @@ const MenuApi = {
       console.error("에러가 발생했습니다.");
     }
   },
+
+  async updateMenuName(category, menuId, name) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      },
+    );
+    if (!response.ok) {
+      console.error("에러가 발생했습니다.");
+    }
+
+    return response.json();
+  },
 };
 
 function App() {
@@ -42,15 +58,15 @@ function App() {
 
   const render = () => {
     const template = this.menu[this.currentCategory]
-      .map((item, index) => menuItemTemplate(item.name, index, item.soldOut))
+      .map((item) => menuItemTemplate(item.id, item.name, item.soldOut))
       .join("");
     $("#menu-list").innerHTML = template;
     updateMenuCount();
   };
 
-  const menuItemTemplate = (menuName, index, isSoldOut) => {
+  const menuItemTemplate = (menuId, menuName, isSoldOut) => {
     return `
-    <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+    <li data-menu-id="${menuId}" class="menu-list-item d-flex items-center py-2">
       <span class="${
         isSoldOut ? "sold-out" : ""
       } w-100 pl-2 menu-name">${menuName}</span>
@@ -97,18 +113,18 @@ function App() {
     render();
   };
 
-  const updateMenuName = (e) => {
+  const updateMenuName = async (e) => {
     const $menuName = e.target.closest("li").querySelector(".menu-name");
     const menuId = e.target.closest("li").dataset.menuId;
 
-    const updatedMenuName = prompt(
-      "수정할 이름을 입력해주세요.",
-      $menuName.textContent,
-    );
+    const updatedMenuName =
+      prompt("수정할 이름을 입력해주세요.", $menuName.textContent) ??
+      $menuName.textContent;
 
-    this.menu[this.currentCategory][menuId].name =
-      updatedMenuName ?? $menuName.textContent;
-    store.setLocalStorage(this.menu);
+    await MenuApi.updateMenuName(this.currentCategory, menuId, updatedMenuName);
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory,
+    );
     render();
   };
 
